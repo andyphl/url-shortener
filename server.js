@@ -1,6 +1,8 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
+const redisClient = require('redis').createClient;
+const redis = redisClient(6379, 'localhost');
 const cors = require('cors');
 
 const URL = require('./models/Urls')
@@ -9,6 +11,9 @@ const app = express();
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
 app.use(cors());
+
+// Redis connection
+redis.on('error', (err) => console.log(err));
 
 
 // MongoDB connection
@@ -24,13 +29,25 @@ app.use('/api/shorten', shorten);
 // Redirect
 app.get('/:hash', (req, res) => {
   const hashId = req.params.hash;
-
-  URL.findOne({ _id: hashId }, (err, doc) => {
-    if(doc) {
-      res.redirect(doc.originUrl);
+  
+  redis.get(hashId, (err, reply) => {
+    if(reply) {
+      res.redirect(reply);
     }
     else {
-      res.redirect('http://localhost:3000/');
+      if(err) {
+        console.log(err);
+      }
+      // Both not found and error lead to mongoDB search.
+      URL.findOne({ _id: hashId }, (err, doc) => {
+        if(doc) {
+          res.redirect(doc.originUrl);
+          redis.set(hashId, doc.originUrl);
+        }
+        else {
+          res.redirect('http://localhost:3000/');
+        }
+      });
     }
   });
 })
