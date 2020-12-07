@@ -1,0 +1,25 @@
+{
+  "name": "url-shortener",
+  "version": "1.0.0",
+  "description": "A url shortener built with Node.js/Express, React, MongoDB.",
+  "main": "server.js",
+  "scripts": {
+    "server": "nodemon server.js",
+    "client": "npm start --prefix client",
+    "dev": "concurrently \"npm run server\" \"npm run client\" "
+  },
+  "keywords": [
+    "shortener"
+  ],
+  "author": "andyphl",
+  "license": "MIT",
+  "dependencies": {
+    "concurrently": "^5.3.0",
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "mongoose": "^5.11.4",
+    "nodemon": "^2.0.6",
+    "redis": "^3.0.2",
+    "uniqid": "^5.2.0"
+  }
+}

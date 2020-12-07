@@ -1,0 +1,102 @@
+* {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  display: grid;
+  place-items: center;
+  height: 100vh;
+  width: 100vw;
+  font-family: 'Lobster', 'Noto Sans TC', cursive, sans-serif;
+  background-image: linear-gradient(120deg, #84fab0 0%, #8fd3f4 100%);
+
+}
+
+main {
+  text-align: center;
+  width: 95vw;
+}
+
+main > h1 {
+  font-size: 70px;
+}
+
+main > h3 {
+  font-size: 20px;
+  margin: 0.5rem 0 1rem 0;
+}
+
+input{
+  font-size: 20px;
+}
+
+.shortener {
+  width: 100%;
+}
+
+.shortener > form {
+  display: flex;
+  flex-direction: column;
+}
+
+.shortener__url {
+  margin: auto;
+  width: 100%;
+}
+
+.shortener__url > input[type="text"] {
+  width: clamp(10ch, 50%, 46ch);
+  border: none;
+  outline: none;
+  height: 50px;
+  padding: 0 25px;
+  border-radius: 25px 0 0 25px;
+}
+
+.shortener__url > input[type="submit"] {
+  top: 1px;
+  position: relative;
+  border-radius: 0 25px 25px 0;
+  border: none;
+  outline: none;
+  background-color: #181818;
+  color: #fff;
+  height: 50px;
+  width: 7ch;
+  cursor: pointer;
+}
+
+.shortener__url > input[type="submit"]:hover {
+  background-color: #2b9752;
+}
+
+.shortener__reurl {
+  margin: 1rem auto 0 auto;
+  width: 75%;
+  height: 100px;
+  overflow-x: scroll;
+}
+
+.shortener__reurl::-webkit-scrollbar {
+  display: none;
+}
+
+.shortener__reurl > span {
+  font-size: 20px;
+  margin-right: 1rem;
+}
+
+.shortener__reurl > input[type="button"] {
+  border-radius: 25px;
+  padding: 0.5rem;
+  background-color: #181818;
+  color: #fff;
+  border: none;
+  outline: none;
+  cursor: pointer;
+}
+
+.shortener__reurl > input[type="button"]:hover {
+  background-color: #2b9752;
+}
