@@ -49,7 +49,8 @@ router.post('/', (req, res) => {
         }
         else {
           console.log('URL saved in MongoDB 🤩.');
-          redis.set(urlHashed._id, originUrl, (err, res) => {
+          // Expire after a mounth
+          redis.set(urlHashed._id, originUrl, 'EX', 60 * 60 * 24 * 30, (err, res) => {
             if(err) { console.log(err); }
             else {
               console.log('URL cached in Redis 🤩.');

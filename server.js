@@ -43,7 +43,8 @@ app.get('/:hash', (req, res) => {
       URL.findOne({ _id: hashId }, (err, doc) => {
         if(doc) {
           res.redirect(doc.originUrl);
-          redis.set(hashId, doc.originUrl, (err, res) => {
+          // Expire after a mounth
+          redis.set(hashId, doc.originUrl, 'EX', 60 * 60 * 24 * 30 , (err, res) => {
             if(err) { console.log(err); }
             else {
               console.log('URL cached in Redis 🤩.');
