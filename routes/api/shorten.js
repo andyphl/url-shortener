@@ -1,8 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const uniqid = require('uniqid');
-const redisClient = require('redis').createClient;
-const redis = redisClient(6379, 'localhost');
+const redis = require('../../config/redis');
 
 const URL = require('../../models/Urls');
 
@@ -51,7 +50,9 @@ router.post('/', (req, res) => {
           console.log('URL saved in MongoDB 🤩.');
           // Expire after a mounth
           redis.set(urlHashed._id, originUrl, 'EX', 60 * 60 * 24 * 30, (err, res) => {
-            if(err) { console.log(err); }
+            if(err) { 
+              console.log(err); 
+            }
             else {
               console.log('URL cached in Redis 🤩.');
             }

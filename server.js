@@ -1,9 +1,9 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
-const redisClient = require('redis').createClient;
-const redis = redisClient(6379, 'localhost');
+const redis = require('./config/redis');
 const cors = require('cors');
+require('dotenv').config();
 
 const URL = require('./models/Urls')
 
@@ -65,6 +65,17 @@ app.get('/', (req, res) => {
 })
 
 const port = process.env.PORT || 5000;
-app.listen(port, () => {
+const server = app.listen(port, () => {
   console.log(`Server is listening on port ${port} 🤩.`);
+});
+
+process.on('SIGTERM',() => {
+  server.close(() => {
+    console.log('Closed out remaining connections👋 .');
+  });
+
+  setTimeout(() => {
+    console.error("Force shut down.");
+    process.exit(1); 
+  }, 30*1000);
 });
