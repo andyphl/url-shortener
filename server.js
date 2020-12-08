@@ -71,7 +71,7 @@ const server = app.listen(port, () => {
 
 process.on('SIGTERM',() => {
   server.close(() => {
-    console.log('Closed out remaining connections👋 .');
+    console.log('Closed out remaining connections👋. ');
   });
 
   setTimeout(() => {
