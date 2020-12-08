@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const uniqid = require('uniqid');
+const redisClient = require('redis').createClient;
+const redis = redisClient(6379, 'localhost');
 
 const URL = require('../../models/Urls');
 
@@ -40,12 +42,19 @@ router.post('/', (req, res) => {
         _id: hashId,
         originUrl: originUrl,
       })
-
+      
       urlHashed.save((err) => {
         if(err) {
           return console.error(err);
         }
         else {
+          console.log('URL saved in MongoDB 🤩.');
+          redis.set(urlHashed._id, originUrl, (err, res) => {
+            if(err) { console.log(err); }
+            else {
+              console.log('URL cached in Redis 🤩.');
+            }
+          });
           res.send({
             originUrl: originUrl,
             hashUrl: urlHashed._id,

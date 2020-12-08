@@ -32,6 +32,7 @@ app.get('/:hash', (req, res) => {
   
   redis.get(hashId, (err, reply) => {
     if(reply) {
+      console.log('URL found in Redis 🤩.')
       res.redirect(reply);
     }
     else {
@@ -42,7 +43,12 @@ app.get('/:hash', (req, res) => {
       URL.findOne({ _id: hashId }, (err, doc) => {
         if(doc) {
           res.redirect(doc.originUrl);
-          redis.set(hashId, doc.originUrl);
+          redis.set(hashId, doc.originUrl, (err, res) => {
+            if(err) { console.log(err); }
+            else {
+              console.log('URL cached in Redis 🤩.');
+            }
+          });
         }
         else {
           res.redirect('http://localhost:3000/');
