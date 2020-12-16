@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const uniqid = require('uniqid');
+const md5 = require('md5');
 const redis = require('../../config/redis');
 
 const URL = require('../../models/Urls');
@@ -19,54 +19,51 @@ router.get('/test', (req, res) => {
 // @route POST /api/shorten
 // @desc Post a URL to get shorten URL
 // @access Public 
-router.post('/', (req, res) => {
+router.post('/', async (req, res) => {
   const { originUrl } = req.body;
+  let hashId = md5(originUrl).slice(0, 8);
+  
+  try {
+    const findDoc = await URL.findOne({hashId: hashId}).exec();
 
-  URL.findOne({originUrl: originUrl}, (err, doc) => {
-    if(doc) {
-      console.log('URL found in DB 🤩.');
-
-      res.send({
-        originUrl: doc.originUrl,
-        hashUrl: doc._id,
-        status: 200,
-        statusTxt: 'OK'
+    if(findDoc && findDoc.originUrl === originUrl) {
+      res.status(200).send({
+        originUrl: findDoc.originUrl,
+        hashUrl: findDoc.hashId
       });
     }
     else {
-      console.log('This is a new URL 🤩.');
+      console.log('This is a new URL 🤔.');
 
-      const hashId = uniqid()
-      const urlHashed = new URL({
-        _id: hashId,
-        originUrl: originUrl,
-      })
+      if(findDoc) {
+        // TODO: When hashId is overlaping?
+      }
       
-      urlHashed.save((err) => {
-        if(err) {
-          return console.error(err);
-        }
-        else {
-          console.log('URL saved in MongoDB 🤩.');
-          // Expire after a mounth
-          redis.set(urlHashed._id, originUrl, 'EX', 60 * 60 * 24 * 30, (err, res) => {
-            if(err) { 
-              console.log(err); 
-            }
-            else {
-              console.log('URL cached in Redis 🤩.');
-            }
-          });
-          res.send({
-            originUrl: originUrl,
-            hashUrl: urlHashed._id,
-            status: 200,
-            statusTxt: 'OK'
-          })
-        }
+      const urlHashed = new URL({
+        hashId: hashId,
+        originUrl: originUrl,
       });
+
+      const saveDoc = await urlHashed.save();
+
+      if(saveDoc) { console.log('Saved in MongoDB 😎.'); }
+      else { console.log('Not saved in MongoDB 🤭.') }
+      const redisSaveDoc = await redis.set(
+        urlHashed.hashId, 
+        originUrl, 
+        'EX', 60 * 60 * 24 * 30
+      ); 
+
+      if(redisSaveDoc) { console.log('Cached in Redis 😎.') }
+      else { console.log('Not cached in Redis 🤭.') }
+
+      res.status(200).send({
+        originUrl: originUrl,
+        hashUrl: urlHashed.hashId
+      })
     }
-  });
+  }
+  catch(err) { console.log(err); }
 });
 
 module.exports = router;

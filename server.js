@@ -18,9 +18,13 @@ redis.on('error', (err) => console.log(err));
 
 // MongoDB connection
 const db = require('./config/keys').mongoURI;
-mongoose.connect(db, { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(() => console.log('MongoDB connected 🤩.'))
-  .catch((err) => console.log(err));
+mongoose.connect(db, { 
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+  useCreateIndex: true
+})
+.then(() => console.log('MongoDB connected 🤩.'))
+.catch((err) => console.log(err));
 
 // Routes
 const shorten = require('./routes/api/shorten');
