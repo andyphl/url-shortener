@@ -72,10 +72,6 @@ app.get('/:hash', async (req, res) => {
 
 // Path
 app.get('/', (req, res) => {
-  res.send('Hello world');
-})
-
-app.get('/*', (req, res) => {
   res.sendFile(path.join(__dirname, 'build', 'index.html'));
 });
 
