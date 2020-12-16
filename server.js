@@ -3,6 +3,7 @@ const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const redis = require('./config/redis');
 const cors = require('cors');
+const path = require('path');
 require('dotenv').config();
 
 const URL = require('./models/Urls')
@@ -11,6 +12,9 @@ const app = express();
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
 app.use(cors());
+
+app.use(express.static(__dirname));
+app.use(express.static(path.join(__dirname, './client/build')))
 
 // Redis connection
 redis.on('error', (err) => console.log(err));
