@@ -26,7 +26,7 @@ router.post('/', async (req, res) => {
   try {
     const findDoc = await URL.findOne({hashId: hashId}).exec();
 
-    if(findDoc && findDoc.originUrl === originUrl) {
+    if(findDoc) {
       res.status(200).send({
         originUrl: findDoc.originUrl,
         hashUrl: findDoc.hashId
@@ -35,9 +35,7 @@ router.post('/', async (req, res) => {
     else {
       console.log('This is a new URL 🤔.');
 
-      if(findDoc) {
-        // TODO: When hashId is overlaping?
-      }
+      // TODO: When hashId is overlaping?
       
       const urlHashed = new URL({
         hashId: hashId,

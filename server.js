@@ -31,36 +31,39 @@ const shorten = require('./routes/api/shorten');
 app.use('/api/shorten', shorten);
 
 // Redirect
-app.get('/:hash', (req, res) => {
+app.get('/:hash', async (req, res) => {
   const hashId = req.params.hash;
   
-  redis.get(hashId, (err, reply) => {
-    if(reply) {
+  try {
+    const redisGetCache = await redis.get(hashId);
+
+    if(redisGetCache) {
       console.log('URL found in Redis 🤩.')
-      res.redirect(reply);
+      res.redirect(redisGetCache);
     }
     else {
-      if(err) {
-        console.log(err);
+      const getDoc = await URL.findOne({hashId: hashId});
+
+      if(getDoc) {
+        console.log('URL found in MongoDB 🤩.')
+        res.redirect(getDoc.originUrl);
+        // Expire after a mounth
+        const redisSaveCache = await redis.set(
+          hashId, 
+          getDoc.originUrl, 
+        )
+        
+        if(redisSaveCache) { console.log('Cached in Redis 😎.'); }
+        else { console.log('Not cached in Redis 🤭.'); }
       }
-      // Both not found and error lead to mongoDB search.
-      URL.findOne({ _id: hashId }, (err, doc) => {
-        if(doc) {
-          res.redirect(doc.originUrl);
-          // Expire after a mounth
-          redis.set(hashId, doc.originUrl, 'EX', 60 * 60 * 24 * 30 , (err, res) => {
-            if(err) { console.log(err); }
-            else {
-              console.log('URL cached in Redis 🤩.');
-            }
-          });
-        }
-        else {
-          res.redirect('http://localhost:3000/');
-        }
-      });
+      else {
+        res.redirect('http://localhost:3000/');
+      }
     }
-  });
+  }
+  catch(error) {
+    console.log(error);
+  }
 })
 
 // Path
