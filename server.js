@@ -43,7 +43,7 @@ app.get('/:hash', async (req, res) => {
       res.redirect(redisGetCache);
     }
     else {
-      const getDoc = await URL.findOne({hashId: hashId});
+      const getDoc = await URL.findOne({hashId: hashId}).exec();
 
       if(getDoc) {
         console.log('URL found in MongoDB 🤩.')
